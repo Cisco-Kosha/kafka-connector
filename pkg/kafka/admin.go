@@ -69,7 +69,7 @@ func (k *Kafka) CreateTopic(topic string, numParts string, replicationFactor str
 		kafka.SetAdminOperationTimeout(maxDur))
 
 	if err != nil {
-		k.Log("Failed to create topic: %v\n", err)
+		k.Log.Errorf("Failed to create topic: %v\n", err)
 		return nil, err
 	}
 

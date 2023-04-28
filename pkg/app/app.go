@@ -21,12 +21,12 @@ type App struct {
 }
 
 type Topic struct {
-	name string
+	Name string `json:"name,omitempty"`
 }
 
 type Consumers struct {
-	name   string
-	offset string
+	Name   string `json:"name,omitempty"`
+	Offset string `json:"offset,omitempty"`
 }
 
 func router() *mux.Router {

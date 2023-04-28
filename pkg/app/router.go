@@ -2,6 +2,7 @@ package app
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	kpkg "github.com/kosha/kafka-connector/pkg/kafka"
 	"net/http"
@@ -136,19 +137,20 @@ func (a *App) createKafkaConsumer(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&c); err != nil {
 		a.Log.Errorf("Error parsing json payload", err)
-		respondWithError(w, http.StatusBadRequest, "Invalid request payload for producing json kafka message")
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload for creating kafka consumers")
 		return
 	}
 	defer r.Body.Close()
-
-	err := a.Kafka.CreateConsumer(c.name, c.offset)
+	fmt.Println("Printing the json body")
+	a.Log.Infof("%v", c)
+	err := a.Kafka.CreateConsumer(c.Name, c.Offset)
 	if err != nil {
 		a.Log.Errorf("Encountered an error in createKafkaConsumer method: %v\n", err)
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success", "name": c.name})
+	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success", "name": c.Name})
 }
 
 func (a *App) subscribeToTopic(w http.ResponseWriter, r *http.Request) {
@@ -170,7 +172,7 @@ func (a *App) subscribeToTopic(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	err := a.Kafka.SubscribeToTopics(t.name, consumerName)
+	err := a.Kafka.SubscribeToTopics(t.Name, consumerName)
 	if err != nil {
 		a.Log.Errorf("Encountered an error in subscribeToTopic method: %v\n", err)
 		respondWithError(w, http.StatusInternalServerError, err.Error())

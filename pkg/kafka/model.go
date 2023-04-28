@@ -35,6 +35,8 @@ func NewKafkaClient(cfg *config.Config, log logger.Logger) *Kafka {
 
 	if k.AdminClient == nil {
 		panic("Could not create Admin Client")
+	} else {
+		k.Log.Info("Successfully created an Kafka Admin Client")
 	}
 
 	k.Producer = CreateProducer(k.Brokers)

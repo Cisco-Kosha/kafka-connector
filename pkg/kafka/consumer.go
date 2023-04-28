@@ -20,7 +20,7 @@ func (k *Kafka) CreateConsumer(name, offset string) error {
 		// will return the IPv6 addresses first.
 		// You typically don't need to specify this configuration property.
 		"broker.address.family": "v4",
-		"group.id":              name,
+		"group.id":              "group-1",
 		"session.timeout.ms":    6000,
 		"auto.offset.reset":     offset})
 
@@ -45,12 +45,15 @@ func (k *Kafka) SubscribeToTopics(topic string, kafkaConsumerName string) error 
 	var c *kafka.Consumer
 
 	for _, consumer := range consumers {
+		k.Log.Infof("%v", consumer)
+		k.Log.Infof("KafkaConsumerName: %s", kafkaConsumerName)
 		if kafkaConsumerName == consumer.Name {
+			k.Log.Infof("Found consumer")
 			c = consumer.Consumer
 		}
 	}
 
-	err := c.Subscribe(topic, nil)
+	err := c.SubscribeTopics([]string{topic}, nil)
 	if err != nil {
 		return err
 	}

@@ -17,5 +17,7 @@ func main() {
 
 	a.Initialize(log)
 
+	log.Infof("Starting Kafka Connector on port: %d", port)
+
 	a.Run(fmt.Sprintf(":%d", port))
 }
