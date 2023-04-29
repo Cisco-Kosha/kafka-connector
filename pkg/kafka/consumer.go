@@ -1,13 +1,25 @@
 package kafka
 
 import (
+	"fmt"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"time"
 )
 
 type Consumer struct {
 	Name     string
 	Offset   string
 	Consumer *kafka.Consumer
+}
+
+type ResMessage struct {
+	TopicPartition kafka.TopicPartition
+	Value          map[string]interface{}
+	Key            []byte
+	Timestamp      time.Time
+	TimestampType  kafka.TimestampType
+	Opaque         interface{}
+	Headers        []kafka.Header
 }
 
 func (k *Kafka) CreateConsumer(name, offset string) error {
@@ -61,7 +73,7 @@ func (k *Kafka) SubscribeToTopics(topic string, kafkaConsumerName string) error 
 	return nil
 }
 
-func (k *Kafka) ConsumeMessage(kafkaConsumerName string) (string, string, error) {
+func (k *Kafka) ConsumeMessage(kafkaConsumerName string) (*kafka.Message, error) {
 
 	consumers := k.Consumers
 
@@ -73,11 +85,12 @@ func (k *Kafka) ConsumeMessage(kafkaConsumerName string) (string, string, error)
 		}
 	}
 
-	msg, err := c.ReadMessage(100)
+	msg, err := c.ReadMessage(time.Second * 10)
 	if err != nil {
 		k.Log.Errorf("Encountered error when reading message. Error: %s", err)
-		return "", "", err
+		return nil, err
 	}
 
-	return msg.String(), string(msg.Value), nil
+	fmt.Println(string(msg.Value))
+	return msg, nil
 }

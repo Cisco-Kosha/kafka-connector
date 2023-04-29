@@ -1,0 +1,37 @@
+{
+  "version": "2.0.0",
+  "fields": [
+    {
+      "field": "BROKER_ADDRESS",
+      "displayName": "Kafka Broker Address along with port",
+      "type": "String",
+      "minLength": 6,
+      "maxLength": 100,
+      "required": true,
+      "description": "Kafka broker address along with port",
+      "example": "localhost:9092"
+    },
+    {
+      "field": "USERNAME",
+      "displayName": "Kafka Broker Username",
+      "type": "String",
+      "minLength": 4,
+      "maxLength": 60,
+      "required": true,
+      "description": "Kafka broker authentication username",
+      "example": "admin",
+      "helpSection": "Use the basic auth username"
+    },
+    {
+      "field": "PASSWORD",
+      "displayName": "Kafka Broker Password",
+      "type": "password",
+      "minLength": 4,
+      "maxLength": 60,
+      "required": true,
+      "description": "Kafka broker authentication password",
+      "example": "admin",
+      "helpSection": "Use the basic auth password"
+    }
+  ]
+}

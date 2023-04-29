@@ -8,6 +8,14 @@ import (
 	"net/http"
 )
 
+// getKafkaTopicMetadata godoc
+// @Summary Get Kafka Topic Metadata details
+// @Description Get Kafka Topic Metadata details
+// @Tags topic
+// @Accept json
+// @Produce json
+// @Success 200 {object} kafka.Metadata
+// @Router /api/v1/getMetadata/{topic} [get]
 func (a *App) getKafkaTopicMetadata(w http.ResponseWriter, r *http.Request) {
 
 	//Allow CORS here By * or specific origin
@@ -28,6 +36,15 @@ func (a *App) getKafkaTopicMetadata(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, &kafkaTopicMetadata)
 }
 
+// createKafkaTopic godoc
+// @Summary Create Kafka Topic
+// @Description Create new Kafka Topic
+// @Tags topic
+// @Accept json
+// @Produce json
+// @Param topic body kpkg.Topic false "Enter topic info"
+// @Success 200 {object} []kafka.TopicResult
+// @Router /api/v1/create [post]
 func (a *App) createKafkaTopic(w http.ResponseWriter, r *http.Request) {
 
 	//Allow CORS here By * or specific origin
@@ -56,6 +73,15 @@ func (a *App) createKafkaTopic(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusCreated, results)
 }
 
+// deleteKafkaTopic godoc
+// @Summary Delete Kafka Topic
+// @Description Delete Kafka Topic
+// @Tags topic
+// @Accept json
+// @Produce json
+// @Param topic path string false "Enter topic name"
+// @Success 200 {object} []kafka.TopicResult
+// @Router /api/v1/delete/{topic} [delete]
 func (a *App) deleteKafkaTopic(w http.ResponseWriter, r *http.Request) {
 
 	//Allow CORS here By * or specific origin
@@ -76,6 +102,16 @@ func (a *App) deleteKafkaTopic(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, &results)
 }
 
+// describeConfiguration godoc
+// @Summary Describe Broker Config
+// @Description Describe Broker Config
+// @Tags metadata
+// @Accept json
+// @Produce json
+// @Param resourceType path string false "Enter resource type"
+// @Param resourceName path string false "Enter resource name"
+// @Success 200 {object} []kafka.ConfigResourceResult
+// @Router /api/v1/describe/{resourceType}/{resourceName} [get]
 func (a *App) describeConfiguration(w http.ResponseWriter, r *http.Request) {
 
 	//Allow CORS here By * or specific origin
@@ -97,6 +133,16 @@ func (a *App) describeConfiguration(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, &results)
 }
 
+// produceKafkaMessage godoc
+// @Summary Produce a kafka message
+// @Description Produce a kafka message
+// @Tags producer
+// @Accept json
+// @Produce json
+// @Param topic path string false "Enter topic name"
+// @Param message body map[string]interface{} false "Enter message"
+// @Success 200 {object}  object
+// @Router /api/v1/produce/{topic}/ [post]
 func (a *App) produceKafkaMessage(w http.ResponseWriter, r *http.Request) {
 
 	//Allow CORS here By * or specific origin
@@ -126,6 +172,16 @@ func (a *App) produceKafkaMessage(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
+// createKafkaConsumer godoc
+// @Summary Create a new Kafka Consumer
+// @Description Create a new Kafka Consumer
+// @Tags consumer
+// @Accept json
+// @Produce json
+// @Param resourceType path string false "Enter resource type"
+// @Param resourceName path string false "Enter resource name"
+// @Success 200 {object}  object
+// @Router /api/v1/consumers [post]
 func (a *App) createKafkaConsumer(w http.ResponseWriter, r *http.Request) {
 
 	//Allow CORS here By * or specific origin
@@ -153,6 +209,16 @@ func (a *App) createKafkaConsumer(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success", "name": c.Name})
 }
 
+// subscribeToTopic godoc
+// @Summary Subscribe to a Kafka Topic
+// @Description Subscribe to a Kafka topic
+// @Tags topic
+// @Accept json
+// @Produce json
+// @Param name path string false "Enter consumer name"
+// @Param topic body Topic false "Enter topic name"
+// @Success 200 {object} object
+// @Router /api/v1/consumers/{name}/subscribe [post]
 func (a *App) subscribeToTopic(w http.ResponseWriter, r *http.Request) {
 
 	//Allow CORS here By * or specific origin
@@ -182,6 +248,15 @@ func (a *App) subscribeToTopic(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
+// consumeMessage godoc
+// @Summary Consume last message from a kafka topic
+// @Description Consume last message from a kafka topic
+// @Tags consumer
+// @Accept json
+// @Produce json
+// @Param name path string false "Enter consumer name"
+// @Success 200 {object} map[string]string
+// @Router /api/v1/consumers/{name}/consume [get]
 func (a *App) consumeMessage(w http.ResponseWriter, r *http.Request) {
 
 	//Allow CORS here By * or specific origin
@@ -192,12 +267,30 @@ func (a *App) consumeMessage(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	consumerName, _ := vars["name"]
 
-	topicMetadata, msg, err := a.Kafka.ConsumeMessage(consumerName)
+	msg, err := a.Kafka.ConsumeMessage(consumerName)
 	if err != nil {
 		a.Log.Errorf("Encountered an error in consumeMessage method: %v\n", err)
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, map[string]string{"KafkaMessage": topicMetadata, "value": msg})
+	var value map[string]interface{}
+	err = json.Unmarshal(msg.Value, &value)
+	if err != nil {
+		a.Log.Errorf("Encountered an error in unmarshalling byte array into interface struct: %v\n", err)
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	res := &kpkg.ResMessage{
+		TopicPartition: msg.TopicPartition,
+		Value:          value,
+		Key:            msg.Key,
+		Timestamp:      msg.Timestamp,
+		TimestampType:  msg.TimestampType,
+		Opaque:         msg.Opaque,
+		Headers:        msg.Headers,
+	}
+
+	respondWithJSON(w, http.StatusOK, res)
 }
