@@ -15,9 +15,9 @@
       "field": "USERNAME",
       "displayName": "Kafka Broker Username",
       "type": "String",
-      "minLength": 4,
+      "minLength": 0,
       "maxLength": 60,
-      "required": true,
+      "required": false,
       "description": "Kafka broker authentication username",
       "example": "admin",
       "helpSection": "Use the basic auth username"
@@ -26,9 +26,9 @@
       "field": "PASSWORD",
       "displayName": "Kafka Broker Password",
       "type": "password",
-      "minLength": 4,
+      "minLength": 0,
       "maxLength": 60,
-      "required": true,
+      "required": false,
       "description": "Kafka broker authentication password",
       "example": "admin",
       "helpSection": "Use the basic auth password"
