@@ -1,0 +1,494 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "contact": {
+      "email": "eti@cisco.io",
+      "name": "API Support"
+    },
+    "description": "This is a Kosha REST serice for exposing many kafka features as REST APIs with better consistency, observability etc",
+    "termsOfService": "http://swagger.io/terms/",
+    "title": "Kafka Connector API",
+    "version": "2.0"
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "paths": {
+    "/api/v1/consumers": {
+      "post": {
+        "parameters": [
+          {
+            "description": "Enter resource type",
+            "in": "path",
+            "name": "resourceType",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Enter resource name",
+            "in": "path",
+            "name": "resourceName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "consumer"
+        ],
+        "description": "Create a new Kafka Consumer",
+        "summary": "Create a new Kafka Consumer"
+      }
+    },
+    "/api/v1/consumers/{name}/consume": {
+      "get": {
+        "parameters": [
+          {
+            "description": "Enter consumer name",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "consumer"
+        ],
+        "description": "Consume last message from a kafka topic",
+        "summary": "Consume last message from a kafka topic"
+      }
+    },
+    "/api/v1/consumers/{name}/subscribe": {
+      "post": {
+        "parameters": [
+          {
+            "description": "Enter consumer name",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "topic"
+        ],
+        "description": "Subscribe to a Kafka topic",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/app.Topic"
+              }
+            }
+          },
+          "description": "Enter topic name"
+        },
+        "summary": "Subscribe to a Kafka Topic"
+      }
+    },
+    "/api/v1/create": {
+      "post": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/kafka.TopicResult"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "topic"
+        ],
+        "description": "Create new Kafka Topic",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/kafka.Topic"
+              }
+            }
+          },
+          "description": "Enter topic info"
+        },
+        "summary": "Create Kafka Topic"
+      }
+    },
+    "/api/v1/delete/{topic}": {
+      "delete": {
+        "parameters": [
+          {
+            "description": "Enter topic name",
+            "in": "path",
+            "name": "topic",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/kafka.TopicResult"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "topic"
+        ],
+        "description": "Delete Kafka Topic",
+        "summary": "Delete Kafka Topic"
+      }
+    },
+    "/api/v1/describe/{resourceType}/{resourceName}": {
+      "get": {
+        "parameters": [
+          {
+            "description": "Enter resource type",
+            "in": "path",
+            "name": "resourceType",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Enter resource name",
+            "in": "path",
+            "name": "resourceName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/kafka.ConfigResourceResult"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "metadata"
+        ],
+        "description": "Describe Broker Config",
+        "summary": "Describe Broker Config"
+      }
+    },
+    "/api/v1/getMetadata/{topic}": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/kafka.Metadata"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "topic"
+        ],
+        "description": "Get Kafka Topic Metadata details",
+        "summary": "Get Kafka Topic Metadata details"
+      }
+    },
+    "/api/v1/produce/{topic}/": {
+      "post": {
+        "parameters": [
+          {
+            "description": "Enter topic name",
+            "in": "path",
+            "name": "topic",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "producer"
+        ],
+        "description": "Produce a kafka message",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "type": "object"
+              }
+            }
+          },
+          "description": "Enter message"
+        },
+        "summary": "Produce a kafka message"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "app.Topic": {
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "kafka.BrokerMetadata": {
+        "properties": {
+          "host": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "port": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "kafka.ConfigEntryResult": {
+        "properties": {
+          "isReadOnly": {
+            "description": "IsReadOnly indicates whether the configuration entry can be altered.",
+            "type": "boolean"
+          },
+          "isSensitive": {
+            "description": "IsSensitive indicates whether the configuration entry contains sensitive information, in which case the value will be unset.",
+            "type": "boolean"
+          },
+          "isSynonym": {
+            "description": "IsSynonym indicates whether the configuration entry is a synonym for another configuration property.",
+            "type": "boolean"
+          },
+          "name": {
+            "description": "Name of configuration entry, e.g., topic configuration property name.",
+            "type": "string"
+          },
+          "source": {
+            "description": "Source indicates the configuration source.",
+            "type": "integer"
+          },
+          "synonyms": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/kafka.ConfigEntryResult"
+            },
+            "description": "Synonyms contains a map of configuration entries that are synonyms to this configuration entry.",
+            "type": "object"
+          },
+          "value": {
+            "description": "Value of configuration entry.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "kafka.ConfigResourceResult": {
+        "properties": {
+          "config": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/kafka.ConfigEntryResult"
+            },
+            "description": "Config entries, if any, of returned result resource.",
+            "type": "object"
+          },
+          "error": {
+            "$ref": "#/components/schemas/kafka.Error",
+            "description": "Error, if any, of returned result resource."
+          },
+          "name": {
+            "description": "Name of returned result resource.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Type of returned result resource.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "kafka.Error": {
+        "type": "object"
+      },
+      "kafka.Metadata": {
+        "properties": {
+          "brokers": {
+            "items": {
+              "$ref": "#/components/schemas/kafka.BrokerMetadata"
+            },
+            "type": "array"
+          },
+          "originatingBroker": {
+            "$ref": "#/components/schemas/kafka.BrokerMetadata"
+          },
+          "topics": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/kafka.TopicMetadata"
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "kafka.PartitionMetadata": {
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/kafka.Error"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "isrs": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "leader": {
+            "type": "integer"
+          },
+          "replicas": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "kafka.Topic": {
+        "properties": {
+          "numParts": {
+            "type": "string"
+          },
+          "replicationFactor": {
+            "type": "string"
+          },
+          "topic": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "kafka.TopicMetadata": {
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/kafka.Error"
+          },
+          "partitions": {
+            "items": {
+              "$ref": "#/components/schemas/kafka.PartitionMetadata"
+            },
+            "type": "array"
+          },
+          "topic": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "kafka.TopicResult": {
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/kafka.Error",
+            "description": "Error, if any, of result. Check with `Error.Code() != ErrNoError`."
+          },
+          "topic": {
+            "description": "Topic name",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    }
+  }
+}

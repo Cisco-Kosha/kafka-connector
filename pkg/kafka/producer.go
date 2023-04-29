@@ -1,8 +1,7 @@
 package kafka
 
 import (
-	"bytes"
-	"encoding/gob"
+	"encoding/json"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
@@ -21,17 +20,11 @@ func (k *Kafka) ProduceMessages(topic string, value map[string]interface{}) erro
 
 	deliveryChan := make(chan kafka.Event)
 
-	var buf bytes.Buffer
-	enc := gob.NewEncoder(&buf)
+	b, _ := json.Marshal(value)
 
-	err := enc.Encode(value)
-	if err != nil {
-		k.Log.Errorf("Cannot convert payload into byte array using gob package: %v", value)
-		return err
-	}
-	err = k.Producer.Produce(&kafka.Message{
+	err := k.Producer.Produce(&kafka.Message{
 		TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
-		Value:          buf.Bytes(),
+		Value:          b,
 		Headers:        []kafka.Header{{Key: "myTestHeader", Value: []byte("header values are binary")}},
 	}, deliveryChan)
 

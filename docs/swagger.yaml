@@ -1,0 +1,319 @@
+basePath: /
+definitions:
+  app.Topic:
+    properties:
+      name:
+        type: string
+    type: object
+  kafka.BrokerMetadata:
+    properties:
+      host:
+        type: string
+      id:
+        type: integer
+      port:
+        type: integer
+    type: object
+  kafka.ConfigEntryResult:
+    properties:
+      isReadOnly:
+        description: IsReadOnly indicates whether the configuration entry can be altered.
+        type: boolean
+      isSensitive:
+        description: IsSensitive indicates whether the configuration entry contains
+          sensitive information, in which case the value will be unset.
+        type: boolean
+      isSynonym:
+        description: IsSynonym indicates whether the configuration entry is a synonym
+          for another configuration property.
+        type: boolean
+      name:
+        description: Name of configuration entry, e.g., topic configuration property
+          name.
+        type: string
+      source:
+        description: Source indicates the configuration source.
+        type: integer
+      synonyms:
+        additionalProperties:
+          $ref: '#/definitions/kafka.ConfigEntryResult'
+        description: Synonyms contains a map of configuration entries that are synonyms
+          to this configuration entry.
+        type: object
+      value:
+        description: Value of configuration entry.
+        type: string
+    type: object
+  kafka.ConfigResourceResult:
+    properties:
+      config:
+        additionalProperties:
+          $ref: '#/definitions/kafka.ConfigEntryResult'
+        description: Config entries, if any, of returned result resource.
+        type: object
+      error:
+        $ref: '#/definitions/kafka.Error'
+        description: Error, if any, of returned result resource.
+      name:
+        description: Name of returned result resource.
+        type: string
+      type:
+        description: Type of returned result resource.
+        type: integer
+    type: object
+  kafka.Error:
+    type: object
+  kafka.Metadata:
+    properties:
+      brokers:
+        items:
+          $ref: '#/definitions/kafka.BrokerMetadata'
+        type: array
+      originatingBroker:
+        $ref: '#/definitions/kafka.BrokerMetadata'
+      topics:
+        additionalProperties:
+          $ref: '#/definitions/kafka.TopicMetadata'
+        type: object
+    type: object
+  kafka.PartitionMetadata:
+    properties:
+      error:
+        $ref: '#/definitions/kafka.Error'
+      id:
+        type: integer
+      isrs:
+        items:
+          type: integer
+        type: array
+      leader:
+        type: integer
+      replicas:
+        items:
+          type: integer
+        type: array
+    type: object
+  kafka.Topic:
+    properties:
+      numParts:
+        type: string
+      replicationFactor:
+        type: string
+      topic:
+        type: string
+    type: object
+  kafka.TopicMetadata:
+    properties:
+      error:
+        $ref: '#/definitions/kafka.Error'
+      partitions:
+        items:
+          $ref: '#/definitions/kafka.PartitionMetadata'
+        type: array
+      topic:
+        type: string
+    type: object
+  kafka.TopicResult:
+    properties:
+      error:
+        $ref: '#/definitions/kafka.Error'
+        description: Error, if any, of result. Check with `Error.Code() != ErrNoError`.
+      topic:
+        description: Topic name
+        type: string
+    type: object
+host: localhost:8000
+info:
+  contact:
+    email: eti@cisco.io
+    name: API Support
+  description: This is a Kosha REST serice for exposing many kafka features as REST
+    APIs with better consistency, observability etc
+  termsOfService: http://swagger.io/terms/
+  title: Kafka Connector API
+  version: "2.0"
+paths:
+  /api/v1/consumers:
+    post:
+      consumes:
+      - application/json
+      description: Create a new Kafka Consumer
+      parameters:
+      - description: Enter resource type
+        in: path
+        name: resourceType
+        type: string
+      - description: Enter resource name
+        in: path
+        name: resourceName
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+      summary: Create a new Kafka Consumer
+      tags:
+      - consumer
+  /api/v1/consumers/{name}/consume:
+    get:
+      consumes:
+      - application/json
+      description: Consume last message from a kafka topic
+      parameters:
+      - description: Enter consumer name
+        in: path
+        name: name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Consume last message from a kafka topic
+      tags:
+      - consumer
+  /api/v1/consumers/{name}/subscribe:
+    post:
+      consumes:
+      - application/json
+      description: Subscribe to a Kafka topic
+      parameters:
+      - description: Enter consumer name
+        in: path
+        name: name
+        type: string
+      - description: Enter topic name
+        in: body
+        name: topic
+        schema:
+          $ref: '#/definitions/app.Topic'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+      summary: Subscribe to a Kafka Topic
+      tags:
+      - topic
+  /api/v1/create:
+    post:
+      consumes:
+      - application/json
+      description: Create new Kafka Topic
+      parameters:
+      - description: Enter topic info
+        in: body
+        name: topic
+        schema:
+          $ref: '#/definitions/kafka.Topic'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/kafka.TopicResult'
+            type: array
+      summary: Create Kafka Topic
+      tags:
+      - topic
+  /api/v1/delete/{topic}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Kafka Topic
+      parameters:
+      - description: Enter topic name
+        in: path
+        name: topic
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/kafka.TopicResult'
+            type: array
+      summary: Delete Kafka Topic
+      tags:
+      - topic
+  /api/v1/describe/{resourceType}/{resourceName}:
+    get:
+      consumes:
+      - application/json
+      description: Describe Broker Config
+      parameters:
+      - description: Enter resource type
+        in: path
+        name: resourceType
+        type: string
+      - description: Enter resource name
+        in: path
+        name: resourceName
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/kafka.ConfigResourceResult'
+            type: array
+      summary: Describe Broker Config
+      tags:
+      - metadata
+  /api/v1/getMetadata/{topic}:
+    get:
+      consumes:
+      - application/json
+      description: Get Kafka Topic Metadata details
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/kafka.Metadata'
+      summary: Get Kafka Topic Metadata details
+      tags:
+      - topic
+  /api/v1/produce/{topic}/:
+    post:
+      consumes:
+      - application/json
+      description: Produce a kafka message
+      parameters:
+      - description: Enter topic name
+        in: path
+        name: topic
+        type: string
+      - description: Enter message
+        in: body
+        name: message
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+      summary: Produce a kafka message
+      tags:
+      - producer
+swagger: "2.0"
