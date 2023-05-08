@@ -1,4 +1,4 @@
-# Kafka Connector
+# Kosha Kafka Connector
 
 ![Kafka](images/kafka-logo.png)
 
