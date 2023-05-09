@@ -2,7 +2,7 @@
 
 ![Kafka](images/kafka-logo.png)
 
-Apache Kafka is an open-source streaming platform made popular by its stream processing capabilities. Its an industry-leading platform for building real-time data pipelines that function at large scale. Its also popular due to its streaming analytics and data integration capabilities. 
+Apache Kafka is an open source streaming platform made popular by its stream processing capabilities. Its an industry-leading platform for building real-time data pipelines that function at large scale. Its also popular due to its streaming analytics and data integration capabilities. 
 
 The Kosha Kafka connector enables you to perform REST API operations from the Kafka API in your Kosha workflow or custom application. Using the Kosha Kafka connector, you can directly access the Kafka platform to:
 
@@ -14,7 +14,7 @@ The Kosha Kafka connector enables you to perform REST API operations from the Ka
 
 ## Useful Actions
 
-You can use the Kosha Kafka connector to report data to Kafka from any front-end app built in any language, ingest data into a app from Kafka, and script administrative actions.
+You can use the Kosha Kafka connector to manage Kafka producers, consumers, and topics.
 
 Refer to the Kosha Kafka connector [API specification](openapi.json) for details.
 
@@ -29,16 +29,7 @@ Kafka consumers are client applications that subscribe to (read and process) str
 ### Topics
 
 In Kafka, topics store events. Producers write to topics and consumers read or process events from topic. Use the Kafka APIs to subscribe to topics, create topics, delete topics, and get topic metadata. 
-
-## Example Usage
-
-The following request creates a Kafka topic:
-
-```
-curl -H "Authorization: Basic <BASE64-encoded-key-and-secret>" -H 'Content-Type: application/json' \
---request POST --url 'https://<REST-endpoint>/kafka/v3/clusters/<cluster-id>/topics' \
--d '{"topic_name": "<topic-name>", "partitions_count": <Partitions count>, "replication_factor": <Replication factor>}'
-```  
+  
 ## Authentication
 
 To authenticate when provisioning the Kosha Kafka connector, you need your:
