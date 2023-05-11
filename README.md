@@ -1,7 +1,5 @@
 # Kosha Kafka Connector
 
-![Kafka](images/kafka-logo.png)
-
 Apache Kafka is an open source streaming platform made popular by its stream processing capabilities. Its an industry-leading platform for building real-time data pipelines that function at large scale. Its also popular due to its streaming analytics and data integration capabilities. 
 
 The Kosha Kafka connector enables you to perform REST API operations from the Kafka API in your Kosha workflow or custom application. Using the Kosha Kafka connector, you can directly access the Kafka platform to:
